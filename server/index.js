@@ -22,5 +22,45 @@ io.sockets.on("connection", function(socket){
     //got the file finally
     console.log(req.body);
 
+    var jsonToSend = {
+      source: encodeURI("print 'Hello World';"),
+      lang: "PYTHON",
+      async: 0,
+      client_secret: "292e6a6657ade5e7feeded46ae0f0ab74092a476",
+      time_limit: 5,
+      memory_limit: 262144
+    };
+
+    console.log(JSON.stringify(jsonToSend));
+
+    var HRoptions = {
+      hostname: 'api.hackerearth.com',
+      port: 80,
+      path: '/v3/code/run/',
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(JSON.stringify(jsonToSend))
+      }
+    };
+
+    var HRrequest = http.request(HRoptions, function(HRresponse) {
+      console.log('Status: ' + HRresponse.statusCode);
+      console.log('Headers: ' + JSON.stringify(HRresponse.headers));
+      HRresponse.setEncoding('utf8');
+      HRresponse.on('data', function (body) {
+        console.log('Body: ' + body);
+      });
+    });
+    HRrequest.on('error', function(e) {
+      console.log('problem with request: ' + e.message);
+    });
+    // write data to request body
+    HRrequest.write(JSON.stringify(jsonToSend));
+    HRrequest.end(function(result) {
+      console.log(result);
+    });
+
   });
+
 });

@@ -28,7 +28,6 @@ $(document).ready(function() {
   $("#submitCode").click(function() {
     var language = $("#editorLanguage").val();
     var code = editor.getValue();
-    //alert(code);
 
     var data = new FormData();
     data.append("language", language);
