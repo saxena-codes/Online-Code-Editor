@@ -23,24 +23,24 @@ io.sockets.on("connection", function(socket){
     console.log(req.body);
 
     var jsonToSend = {
+      request_format: "json",
       source: encodeURI("print 'Hello World';"),
-      lang: "PYTHON",
-      async: 0,
-      client_secret: "292e6a6657ade5e7feeded46ae0f0ab74092a476",
-      time_limit: 5,
-      memory_limit: 262144
+      lang: 5,
+      testcases: encodeURI("['1', '2']"),
+      callback_url: "",
+      wait: true,
+      api_key: "hackerrank|254856-868|5ecf5c36132f3c51b1e15f4e6790ae026f279279"
     };
 
-    console.log(JSON.stringify(jsonToSend));
 
     var HRoptions = {
-      hostname: 'api.hackerearth.com',
+      hostname: 'api.hackerrank.com',
       port: 80,
-      path: '/v3/code/run/',
+      path: '/checker/submission.json',
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(JSON.stringify(jsonToSend))
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(JSON.stringify(jsonToSend))
       }
     };
 
@@ -52,6 +52,7 @@ io.sockets.on("connection", function(socket){
         console.log('Body: ' + body);
       });
     });
+
     HRrequest.on('error', function(e) {
       console.log('problem with request: ' + e.message);
     });
