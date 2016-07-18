@@ -16,6 +16,12 @@ io = io.listen(server);
 io.sockets.on("connection", function(socket){
 
   console.log("Connection Established.");
+  codeChecker();
+  gettingSupportedLanguages();
+
+});
+
+function codeChecker() {
 
   app.post('/code_checker', multer().single(), function(req, res, next) {
 
@@ -24,14 +30,13 @@ io.sockets.on("connection", function(socket){
 
     var jsonToSend = {
       request_format: "json",
-      source: encodeURI("print 'Hello World';"),
+      source: encodeURI(req.body.code),
       lang: 5,
       testcases: encodeURI("['1', '2']"),
       callback_url: "",
       wait: true,
       api_key: "hackerrank|254856-868|5ecf5c36132f3c51b1e15f4e6790ae026f279279"
     };
-
 
     var HRoptions = {
       hostname: 'api.hackerrank.com',
@@ -56,6 +61,7 @@ io.sockets.on("connection", function(socket){
     HRrequest.on('error', function(e) {
       console.log('problem with request: ' + e.message);
     });
+
     // write data to request body
     HRrequest.write(JSON.stringify(jsonToSend));
     HRrequest.end(function(result) {
@@ -64,4 +70,47 @@ io.sockets.on("connection", function(socket){
 
   });
 
-});
+}
+
+function gettingSupportedLanguages() {
+
+  // Getting supported languages by HackerRank Api
+  app.get('/supported_languages', function(req, res, next){
+
+    var returnContent;
+
+    var HRoptions = {
+      hostname: 'api.hackerrank.com',
+      port: 80,
+      path: '/checker/languages.json',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    var HRrequest = http.request(HRoptions, function(HRresponse) {
+      HRresponse.setEncoding('utf8');
+      HRresponse.on('data', function (data) {
+        try {
+          returnContent = data;
+        } catch (e) {
+          returnContent = "Error: " + e;
+        }
+      });
+      HRresponse.on('end', function () {
+        res.json(JSON.parse(returnContent));
+      });
+    });
+
+    HRrequest.on('error', function(e) {
+      returnContent = "Error: " + e.message;
+    });
+
+    HRrequest.write(""); // --> important for initiating request, sending empty string.
+
+    HRrequest.end();
+
+  });
+
+}
