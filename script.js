@@ -1,9 +1,9 @@
 var socket = io.connect("/");
+var editor = ace.edit("editor");
 
 $(document).ready(function() {
 
   //Editor initialization
-  var editor = ace.edit("editor");
   editor.setTheme("ace/theme/chrome");
   editor.session.setMode("ace/mode/javascript");
   getEditorThemes();
@@ -17,21 +17,17 @@ $(document).ready(function() {
 
   //Language Changes
   $('#editorLanguage').on('change', function() {
-    switch(this.value) {
-      case "1": selectedLanguage = "c_cpp"; break;
-      case "2": selectedLanguage = "c_cpp"; break;
-      case "9": selectedLanguage = "csharp"; break;
-      case "3": selectedLanguage = "java"; break;
-      case "20": selectedLanguage = "javascript"; break;
-      case "7": selectedLanguage = "php"; break;
-      case "5": selectedLanguage = "python"; break;
-      case "30": selectedLanguage = "python"; break;
-      case "51": selectedLanguage = "swift"; break;
-    }
     getAceEditorMode(this.value);
   });
 
-  //Code Submission
+  //Clear the console
+  $("#clearConsole").click(function() {
+    $("#status pre").empty();
+    $("#status pre").append("$ Console clear");
+  });
+
+
+/*  //Code Submission
   $("#submitCode").click(function() {
     var language = $("#editorLanguage").val();
     var code = editor.getValue().trim();
@@ -65,13 +61,7 @@ $(document).ready(function() {
     }
 
   });
-
-  //Clear the console
-  $("#clearConsole").click(function() {
-    $("#status pre").empty();
-    $("#status pre").append("$ Console clear");
-  });
-
+*/
 });
 
 function getEditorThemes() {
@@ -132,8 +122,18 @@ function getAceEditorMode(mode) {
     url: "ace_modes.json",
     type: "GET",
     success: function(data) {
-      var newMode = "";      
-      setEditorMode(newMode);
+      console.log(data);
+      var newMode = data.AceModesAccordingToHackerRankCodes[mode];
+      //console.log(data.AceModesAccordingToHackerRankCodes[mode]);
+      if(!newMode) {
+        //Mode not available in ace editor
+        setAceEditorMode("text");
+        showStatusMsg("Mode not available in ace editor, so editor will not be able to highlight text.");
+        showStatusMsg("Language Changed");
+      } else {
+        //Mode available in ace editor
+        setAceEditorMode(newMode);
+      }
     },
     error: function(error) {
       showStatusMsg("Error in getting editor themes. Please refresh the page, or check your internet connection.");
@@ -143,7 +143,7 @@ function getAceEditorMode(mode) {
 
 function setAceEditorMode(mode) {
   editor.session.setMode("ace/mode/" + mode);
-  showStatusMsg("Language Changed: " + mode);
+  showStatusMsg("Language changed.");
 }
 
 function showStatusMsg(msg) {
