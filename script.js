@@ -27,41 +27,11 @@ $(document).ready(function() {
   });
 
 
-/*  //Code Submission
+  //Code Submission
   $("#submitCode").click(function() {
-    var language = $("#editorLanguage").val();
-    var code = editor.getValue().trim();
-
-    if(code && code.length) {
-      var data = new FormData();
-      data.append("language", language);
-      data.append("code", code);
-
-      showStatusMsg("Code submitted. Processing, please wait.");
-      //$("#submitCode").addClass("btn-disable");
-
-      $.ajax({
-        url: "//localhost:8080/code_checker",
-        type: "POST",
-        data: data,
-        cache: false,
-        dataType: 'json',
-        processData: false,
-        contentType: false,
-        success: function(data) {
-
-        },
-        error: function(err) {
-          console.log(err);
-          //showStatusMsg("Error: " + err);
-        }
-      });
-    } else {
-      showStatusMsg("Please enter the code before submitting.");
-    }
-
+    codeChecker();
   });
-*/
+
 });
 
 function getEditorThemes() {
@@ -104,13 +74,17 @@ function getSuppotedLanguages() {
 
 function setSupportedLanguages(data) {
   var data = data.languages;
-  console.log(data);
   for(key in data) {
     if(key === "names") {
       for(secondKey in data[key]) {
         var lang = data[key][secondKey];
         var langCode = data["codes"][secondKey];
-        $("#editorLanguage").append('<option value="' + langCode + '">' + lang + '</option>');
+        if(langCode === 20) {
+          //Default language -> javascript | for editor -> part of initialization
+          $("#editorLanguage").append('<option selected value="' + langCode + '">' + lang + '</option>');
+        } else {
+          $("#editorLanguage").append('<option value="' + langCode + '">' + lang + '</option>');
+        }
       }
     }
   }
@@ -122,9 +96,7 @@ function getAceEditorMode(mode) {
     url: "ace_modes.json",
     type: "GET",
     success: function(data) {
-      console.log(data);
       var newMode = data.AceModesAccordingToHackerRankCodes[mode];
-      //console.log(data.AceModesAccordingToHackerRankCodes[mode]);
       if(!newMode) {
         //Mode not available in ace editor
         setAceEditorMode("text");
@@ -144,6 +116,43 @@ function getAceEditorMode(mode) {
 function setAceEditorMode(mode) {
   editor.session.setMode("ace/mode/" + mode);
   showStatusMsg("Language changed.");
+}
+
+function codeChecker() {
+  //Checking code and giving result.
+  var language = $("#editorLanguage").val();
+  var code = editor.getValue().trim();
+
+  if(code && code.length) {
+    var data = new FormData();
+    data.append("language", language);
+    data.append("code", code);
+
+    showStatusMsg("Code submitted. Processing, please wait.");
+    //Show processing and result pane
+    //..
+
+    $.ajax({
+      url: "//localhost:8080/code_checker",
+      type: "POST",
+      data: data,
+      cache: false,
+      dataType: 'json',
+      processData: false,
+      contentType: false,
+      success: function(data) {
+        console.log(data);
+        //showResult(data);
+        showStatusMsg("Result: " + data.result.stdout);
+      },
+      error: function(err) {
+        showStatusMsg("Error: " + err);
+      }
+    });
+  } else {
+    showStatusMsg("Please write some code before submitting.");
+  }
+
 }
 
 function showStatusMsg(msg) {

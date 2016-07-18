@@ -3,6 +3,7 @@ var http = require('http');
 var io = require('socket.io');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+var querystring = require('querystring');
 
 var app = express();
 //Specifying the public folder of the server to make the html accesible using the static middleware
@@ -25,18 +26,17 @@ function codeChecker() {
 
   app.post('/code_checker', multer().single(), function(req, res, next) {
 
-    //got the file finally
-    console.log(req.body);
+    var returnContent;
 
-    var jsonToSend = {
-      request_format: "json",
-      source: encodeURI(req.body.code),
-      lang: 5,
-      testcases: encodeURI("['1', '2']"),
-      callback_url: "",
-      wait: true,
-      api_key: "hackerrank|254856-868|5ecf5c36132f3c51b1e15f4e6790ae026f279279"
-    };
+    var jsonToSend = querystring.stringify({
+      'request_format': 'json',
+      'source': req.body.code,
+      'lang': req.body.language,
+      'wait': false,
+      'callback_url': '',
+      'api_key': 'hackerrank|254856-868|5ecf5c36132f3c51b1e15f4e6790ae026f279279',
+      'testcases': '["1", "2"]'
+    });
 
     var HRoptions = {
       hostname: 'api.hackerrank.com',
@@ -44,29 +44,33 @@ function codeChecker() {
       path: '/checker/submission.json',
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(JSON.stringify(jsonToSend))
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(jsonToSend)
       }
     };
 
     var HRrequest = http.request(HRoptions, function(HRresponse) {
-      console.log('Status: ' + HRresponse.statusCode);
-      console.log('Headers: ' + JSON.stringify(HRresponse.headers));
       HRresponse.setEncoding('utf8');
-      HRresponse.on('data', function (body) {
-        console.log('Body: ' + body);
+      HRresponse.on('data', function (data) {
+        try {
+          returnContent = data;
+        } catch (e) {
+          returnContent = "Error: " + e;
+        }
+      }).on('end', function () {
+        console.log(JSON.parse(returnContent));
+        res.json(JSON.parse(returnContent));
       });
     });
 
     HRrequest.on('error', function(e) {
-      console.log('problem with request: ' + e.message);
+      returnContent = "Error: " + e.message;
+      res.json(returnContent);
     });
 
-    // write data to request body
-    HRrequest.write(JSON.stringify(jsonToSend));
-    HRrequest.end(function(result) {
-      console.log(result);
-    });
+    HRrequest.write(jsonToSend);
+
+    HRrequest.end();
 
   });
 
@@ -105,6 +109,7 @@ function gettingSupportedLanguages() {
 
     HRrequest.on('error', function(e) {
       returnContent = "Error: " + e.message;
+      res.json(returnContent);
     });
 
     HRrequest.write(""); // --> important for initiating request, sending empty string.
