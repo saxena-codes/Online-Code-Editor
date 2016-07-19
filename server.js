@@ -1,26 +1,18 @@
 var express = require('express');
 var http = require('http');
-var io = require('socket.io');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var querystring = require('querystring');
 
 var app = express();
 //Specifying the public folder of the server to make the html accesible using the static middleware
-app.use(express.static('../'));
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 //Server listens on the port 8124
 var server = http.createServer(app).listen(8080);
-/*initializing the websockets communication , server instance has to be sent as the argument */
-io = io.listen(server);
-
-io.sockets.on("connection", function(socket){
-
-  console.log("Connection Established.");
-  codeChecker();
-  gettingSupportedLanguages();
-
-});
+console.log("Server Started.");
+codeChecker();
+gettingSupportedLanguages();
 
 function codeChecker() {
 
@@ -35,8 +27,10 @@ function codeChecker() {
       'wait': false,
       'callback_url': '',
       'api_key': 'hackerrank|254856-868|5ecf5c36132f3c51b1e15f4e6790ae026f279279',
-      'testcases': '["1", "2"]'
+      'testcases': req.body.testCases
     });
+
+    console.log(req.body);
 
     var HRoptions = {
       hostname: 'api.hackerrank.com',

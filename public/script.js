@@ -1,4 +1,3 @@
-var socket = io.connect("/");
 var editor = ace.edit("editor");
 
 $(document).ready(function() {
@@ -25,7 +24,6 @@ $(document).ready(function() {
     $("#status pre").empty();
     $("#status pre").append("$ Console clear");
   });
-
 
   //Code Submission
   $("#submitCode").click(function() {
@@ -122,33 +120,36 @@ function codeChecker() {
   //Checking code and giving result.
   var language = $("#editorLanguage").val();
   var code = editor.getValue().trim();
+  var testCases = $("#testCases").val();
 
   if(code && code.length) {
-    var data = new FormData();
-    data.append("language", language);
-    data.append("code", code);
+    if(testCases && testCases.length) {
+      var data = new FormData();
+      data.append("language", language);
+      data.append("code", code);
+      data.append("testCases", testCases);
 
-    showStatusMsg("Code submitted. Processing, please wait.");
-    //Show processing and result pane
-    //..
+      showStatusMsg("Code submitted. Processing, please wait.");
 
-    $.ajax({
-      url: "//localhost:8080/code_checker",
-      type: "POST",
-      data: data,
-      cache: false,
-      dataType: 'json',
-      processData: false,
-      contentType: false,
-      success: function(data) {
-        console.log(data);
-        //showResult(data);
-        showStatusMsg("Result: " + data.result.stdout);
-      },
-      error: function(err) {
-        showStatusMsg("Error: " + err);
-      }
-    });
+      $.ajax({
+        url: "//localhost:8080/code_checker",
+        type: "POST",
+        data: data,
+        cache: false,
+        dataType: 'json',
+        processData: false,
+        contentType: false,
+        success: function(data) {
+          showStatusMsg("Result:\n\tstdout: " + data.result.stdout + "\n\tstderr: " + data.result.stderr);
+        },
+        error: function(err) {
+          showStatusMsg("Error: " + err);
+        }
+      });
+    } else {
+      showStatusMsg("Please enter test cases before submitting.");
+    }
+
   } else {
     showStatusMsg("Please write some code before submitting.");
   }
