@@ -121,33 +121,44 @@ function codeChecker() {
   var language = $("#editorLanguage").val();
   var code = editor.getValue().trim();
   var testCases = $("#testCases").val();
+  var hackerRankApi = $("#hackerRankApi").val();
 
   if(code && code.length) {
-    if(testCases && testCases.length) {
-      var data = new FormData();
-      data.append("language", language);
-      data.append("code", code);
-      data.append("testCases", testCases);
 
-      showStatusMsg("Code submitted. Processing, please wait.");
+    if(hackerRankApi && hackerRankApi.length) {
 
-      $.ajax({
-        url: "//localhost:8080/code_checker",
-        type: "POST",
-        data: data,
-        cache: false,
-        dataType: 'json',
-        processData: false,
-        contentType: false,
-        success: function(data) {
-          showStatusMsg("Result:\n\tstdout: " + data.result.stdout + "\n\tstderr: " + data.result.stderr);
-        },
-        error: function(err) {
-          showStatusMsg("Error: " + err);
-        }
-      });
+      if(testCases && testCases.length) {
+
+        var data = new FormData();
+        data.append("language", language);
+        data.append("code", code);
+        data.append("testCases", testCases);
+        data.append("hackerRankApi", hackerRankApi);
+
+        showStatusMsg("Code submitted. Processing, please wait.");
+
+        $.ajax({
+          url: "//localhost:8080/code_checker",
+          type: "POST",
+          data: data,
+          cache: false,
+          dataType: 'json',
+          processData: false,
+          contentType: false,
+          success: function(data) {
+            showStatusMsg("Result:\n\tstdout: " + data.result.stdout + "\n\tstderr: " + data.result.stderr);
+          },
+          error: function(err) {
+            showStatusMsg("Error: " + err);
+          }
+        });
+
+      } else {
+        showStatusMsg("Please enter test cases before submitting.");
+      }
+
     } else {
-      showStatusMsg("Please enter test cases before submitting.");
+      showStatusMsg("Please enter Hacker Rank API key before submitting.");
     }
 
   } else {

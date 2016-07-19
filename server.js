@@ -10,7 +10,12 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 //Server listens on the port 8124
 var server = http.createServer(app).listen(8080);
+
+console.log("To know more visit: http://harshitsaxena.in");
+console.log("Check Git Repo: https://github.com/harshitvsaxena/Online-Code-Editor");
+console.log("--------------------------------------------------------------");
 console.log("Server Started.");
+
 codeChecker();
 gettingSupportedLanguages();
 
@@ -26,10 +31,12 @@ function codeChecker() {
       'lang': req.body.language,
       'wait': false,
       'callback_url': '',
-      'api_key': 'hackerrank|254856-868|5ecf5c36132f3c51b1e15f4e6790ae026f279279',
+      'api_key': req.body.hackerRankApi,
       'testcases': req.body.testCases
     });
 
+    console.log("==============================================================");
+    console.log("Submission:");
     console.log(req.body);
 
     var HRoptions = {
@@ -52,6 +59,8 @@ function codeChecker() {
           returnContent = "Error: " + e;
         }
       }).on('end', function () {
+        console.log("==============================================================");
+        console.log("Response:");
         console.log(JSON.parse(returnContent));
         res.json(JSON.parse(returnContent));
       });
