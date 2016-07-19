@@ -1,4 +1,4 @@
-# Online-Code-Editor
+# Online Code Editor
 
 Code editor for your website. Easy integration and easy set up.
 
@@ -43,4 +43,34 @@ All the ACE themes are indexed in this json file.
 
 ---
 
-Thank You
+### [public/index.html](public/index.html) and [public/script.js](public/script.js)
+
+Main front-end files. Display the editor, as well as script.js contains all the AJAX calls made to the server.
+
+---
+
+### [server.js](server.js)
+
+Main server file, run it like this:
+
+```sh
+$ npm install
+$ node server.js
+```
+
+This will start the server at `localhost:8080`.
+
+---
+
+### [package.json](package.json)
+
+Main packages used in creating this app are:
+
+- http
+- express
+- body-parser
+- multer
+
+---
+
+## Thank You
