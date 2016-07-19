@@ -8,15 +8,13 @@ Check this online at: http://code.runnable.com/u/harshitvsaxena
 
 #### Disclaimer:
 
-We are using Hacker Rank API for compiling and running the code.
+We are using Hacker Rank API for compiling and running the code. You can know more about it by visiting: https://www.hackerrank.com/api/docs
 
-You can know more about it by visiting:
-
-https://www.hackerrank.com/api/docs
+We have used ACE editor, you can visit this great editor at: https://ace.c9.io
 
 ---
 
-## Structure of the folder:
+### Structure of the folder:
 
 ```
 |-- public
@@ -28,6 +26,20 @@ https://www.hackerrank.com/api/docs
 |-- server.js
 |-- package.json
 ```
+
+---
+
+### [public/ace_modes.json](public/ace_modes.json)
+
+This contain all ace editor modes, also it contains ace modes according to the Hacker Rank API language codes. The languages which are not supported by ACE editor are marked as false with respective codes.
+
+When this false is found the editor theme is set to `text`.
+
+---
+
+### [public/ace_themes.json](public/ace_themes.json)
+
+All the ACE themes are indexed in this json file.
 
 ---
 
